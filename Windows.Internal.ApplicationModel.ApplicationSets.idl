@@ -1,0 +1,51 @@
+import "Windows.Foundation.idl";
+import "Windows.ApplicationModel.UserActivities.idl";
+
+namespace Windows.Internal.ApplicationModel.ApplicationSets{
+    runtimeclass ApplicationSet;
+    runtimeclass ApplicationInstance;
+
+    [uuid(d6530953-16ec-4c91-a3cc-b5b95309e167), version(0.0), exclusiveto(ApplicationSet)]
+    interface IApplicationSetStatics : IInspectable {
+        HRESULT CreateApplicationSetAsync([in] HSTRING id, [out, retval] Windows.Foundation.IAsyncOperation<ApplicationSet*>** returnValue);
+        HRESULT GetApplicationSetAsync([in] HSTRING id, [out, retval] Windows.Foundation.IAsyncOperation<ApplicationSet*>** returnValue);
+        HRESULT DeleteApplicationSetAsync([in] HSTRING id, [out, retval] Windows.Foundation.IAsyncAction** returnValue);
+    }
+
+    [uuid(c7d16f29-e8ae-42e6-a94d-8f52cfb4b712), version(0.0), exclusiveto(ApplicationSet)]
+    interface IApplicationSet : IInspectable {
+        [propget] HRESULT SetId([out, retval] HSTRING* returnValue);
+        [propget] HRESULT DisplayText([out, retval] HSTRING* returnValue);
+        [propput] HRESULT DisplayText([in] HSTRING value);
+        [propget] HRESULT ApplicationInstances([out, retval] Windows.Foundation.Collections.IVectorView<ApplicationInstance*>** returnValue);
+        HRESULT GetApplicationInstanceIds([out] Windows.Foundation.Collections.IVectorView<GUID>** instanceIds, [out, retval] HSTRING* returnValue);
+        [overload("AddApplicationInstanceFromUserActivity"), default_overload] HRESULT AddApplicationInstanceFromUserActivity([in] Windows.ApplicationModel.UserActivities.UserActivity* activity, [out, retval] ApplicationInstance** returnValue);
+        [overload("AddApplicationInstanceFromUserActivity")] HRESULT AddApplicationInstanceFromUserActivityById([in] GUID instanceId, [out, retval] ApplicationInstance** returnValue);
+        HRESULT SaveAsync([out, retval] Windows.Foundation.IAsyncAction** returnValue);
+        HRESULT GetOrCreateTimelineActivityForSetAsync([out, retval] Windows.Foundation.IAsyncOperation<Windows.ApplicationModel.UserActivities.UserActivity*>** returnValue);
+        HRESULT Activate();
+    }
+
+    [uuid(f53f8d78-fda5-4449-866a-0e3c469173da), version(0.0), exclusiveto(ApplicationInstance)]
+    interface IApplicationInstance : IInspectable {
+        [propget] HRESULT InstanceId([out, retval] HSTRING* returnValue);
+        [propget] HRESULT ActivationUri([out, retval] Windows.Foundation.Uri** returnValue);
+    }
+
+    [uuid(0c790758-6516-46e5-8290-aeef85b1a7b9), version(0.0), exclusiveto(ApplicationInstance)]
+    interface IApplicationInstancePrivate : IInspectable {
+        HRESULT GetBackingUserActivity([out, retval] Windows.ApplicationModel.UserActivities.UserActivity** returnValue);
+    }
+
+    [static(IApplicationSetStatics, 0.0)]
+    [marshaling_behavior(agile), threading(both), version(0.0)]
+    runtimeclass ApplicationSet{
+        [default] interface IApplicationSet;
+    }
+
+    [marshaling_behavior(agile), threading(both), version(0.0)]
+    runtimeclass ApplicationInstance{
+        [default] interface IApplicationInstance;
+        interface IApplicationInstancePrivate;
+    }
+}
